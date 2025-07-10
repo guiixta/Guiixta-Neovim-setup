@@ -53,7 +53,7 @@ return {
           'hrsh7th/nvim-cmp', -- Já tem
           'hrsh7th/cmp-nvim-lsp', -- Já tem
           'L3MON4D3/LuaSnip', -- Snippets (opcional, mas comum)
-          'saadparwaiz1/cmp_luasnip', -- Integração cmp-luasnip (opcional)
+          'saadparwaiz1/cmp_luasnip', -- Integração cmp-lrasnip (opcional)
       },
       config = function()
           -- Configuração do Mason (gerenciador de LSP servers)
@@ -297,11 +297,15 @@ return {
   {
     'mfussenegger/nvim-lint',
     config = function()
-      require('lint').linters_by_ft = {
-        -- Exemplo: 'javascript': { 'eslint' },
-        -- 'python': { 'pylint' },
+      local lint = require('lint')
+      lint.linters_by_ft = {
+        javascript = {'eslint_d'},
+        typescript = {'eslint_d'},
+        javascriptreact = {'eslint_d'},
+        typescriptreact = {'eslint_d'},
+        -- Adicione outras configurações de linter aqui
       }
-      -- Você pode adicionar um autocmd para rodar o linter ao salvar o arquivo
+      -- Autocmd para rodar o linter ao salvar
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
         callback = function()
           require("lint").try_lint()
