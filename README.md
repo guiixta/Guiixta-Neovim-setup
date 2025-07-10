@@ -24,4 +24,4 @@ Estão presentes os plugins:
 
 # Utilizar Automaticamente
 
-Você pode utilizar meu setup-neovim.sh para instalar/configurar o neovim automaticamente! Ele está nesse repositorio [SetupNeovim-A]().
+Você pode utilizar meu setup-neovim.sh para instalar/configurar o neovim automaticamente! Ele está nesse repositorio [SetupNeovim-A](https://github.com/guiixta/Setup-Automatico-Neovim).
