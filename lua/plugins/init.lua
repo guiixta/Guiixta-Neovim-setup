@@ -298,12 +298,18 @@ return {
     'mfussenegger/nvim-lint',
     config = function()
       local lint = require('lint')
+      local eslint_d_definition = vim.deepcopy(lint.linters.eslint_d)
+
+      eslint_d_definition.cmd = 'npx'
+      table.insert(eslint_d_definition.args, 1, 'eslint_d')
+
+      lint.linters.npx_eslint_d = eslint_d_definition
+
       lint.linters_by_ft = {
-        javascript = {'eslint_d'},
-        typescript = {'eslint_d'},
-        javascriptreact = {'eslint_d'},
-        typescriptreact = {'eslint_d'},
-        -- Adicione outras configurações de linter aqui
+        javascript = {'npx_eslint_d'},
+        typescript = {'npx_eslint_d'},
+        javascriptreact = {'npx_eslint_d'},
+        typescriptreact = {'npx_eslint_d'},
       }
       -- Autocmd para rodar o linter ao salvar
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
@@ -338,5 +344,59 @@ return {
       {"<Leader>l", "<Cmd>MultipleCursorsLock<CR>", mode = {"n", "x"}, desc = "Lock virtual cursors"},
     },
   },
+
+  {
+    'akinsho/toggleterm.nvim',
+    version = "*",
+    config = function()
+      -- Configuração principal
+      require('toggleterm').setup({
+        -- AQUI ESTÁ A MUDANÇA PRINCIPAL
+        direction = 'horizontal', -- O terminal padrão agora abrirá na parte de baixo
+
+        -- O tamanho para um terminal horizontal é a sua altura em linhas.
+        -- 15 é um bom valor, mas você pode ajustar como preferir.
+        size = function(term)
+          if term.direction == "horizontal" then
+            return 15 -- Altura do terminal horizontal
+          elseif term.direction == "vertical" then
+            return vim.o.columns * 0.4 -- Largura do terminal vertical
+          end
+        end,
+        
+        open_mapping = [[<c-\>]],
+        hide_numbers = true,
+        shade_terminals = true,
+        start_in_insert = true,
+        persist_size = true,
+        close_on_exit = true,
+        shell = vim.o.shell,
+      })
+
+      -- Função para encapsular a definição de atalhos
+      function _G.set_terminal_keymaps()
+        local opts = { noremap = true, silent = true }
+        -- Este atalho agora abrirá o terminal HORIZONTAL, pois é o padrão
+        vim.api.nvim_set_keymap('n', '<leader>t', '<cmd>ToggleTerm<cr>', opts)
+        vim.api.nvim_set_keymap('t', '<esc>', [[<C-\><C-n>]], opts)
+      end
+      set_terminal_keymaps()
+
+      -- Os terminais customizados abaixo continuam funcionando como antes
+      local Terminal = require('toggleterm.terminal').Terminal
+
+      -- Lazygit continuará flutuante porque especificamos a direção nele
+      local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = 'float' })
+      function _LAZYGIT_TOGGLE() lazygit:toggle() end
+      vim.api.nvim_set_keymap("n", "<leader>gg", "<cmd>lua _LAZYGIT_TOGGLE()<CR>", {noremap = true, silent = true, desc = "Terminal: Abrir lazygit"})
+      
+      -- Terminal Vertical (útil para quando você precisar de um na lateral)
+      local v_term = Terminal:new({direction = 'vertical', hidden = true})
+      function _VERTICAL_TOGGLE() v_term:toggle() end
+      vim.api.nvim_set_keymap("n", "<leader>vt", "<cmd>lua _VERTICAL_TOGGLE()<CR>", {noremap = true, silent = true, desc = "Terminal: Abrir vertical"})
+
+    end,
+  },
+
 
 }
